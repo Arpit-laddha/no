@@ -1,0 +1,42 @@
+
+% Constants
+Bo = 1;        % Peak Magnetic Field Amplitude
+f = 60;        % Frequency (Hz)
+w = 2*pi*f;    % Angular Frequency
+N = 100;       % Number of turns in each phase winding
+
+t = (0:1/6000:1/60); % Time vector for one cycle
+
+% Phase magnetiac field components (spatial + time sinusoid)
+Baa = Bo * sin(w*t) .* (cos(0) + 1j*sin(0));
+Bbb = Bo * sin(w*t + 2*pi/3) .* (cos(2*pi/3) - 1j*sin(2*pi/3));
+Bcc = Bo * sin(w*t - 2*pi/3) .* (cos(2*pi/3) + 1j*sin(2*pi/3));
+
+% Net rotating magnetic field (for visualization)
+Bnet = Baa + Bbb + Bcc;
+
+% Magnetic flux linkage (assume proportional to phase field)
+% Then EMF = -N * d(phi)/dt
+phi_A = real(Baa); 
+phi_B = real(Bbb); 
+phi_C = real(Bcc);
+
+% Numerical differentiation to compute EMF
+dt = t(2) - t(1);
+eA = -N * diff(phi_A)/dt;
+eB = -N * diff(phi_B)/dt;
+eC = -N * diff(phi_C)/dt;
+
+% Time vector adjusted for diff
+t_e = t(1:end-1);
+
+% --- Plotting EMF Waveforms ---
+figure;
+plot(t_e, eA, 'r', 'LineWidth', 2); hold on;
+plot(t_e, eB, 'g', 'LineWidth', 2);
+plot(t_e, eC, 'b', 'LineWidth', 2);
+xlabel('Time (s)');
+ylabel('Induced EMF (V)');
+title('Induced EMF in 3-Phase Windings');
+legend('Phase A', 'Phase B', 'Phase C');
+grid on;
